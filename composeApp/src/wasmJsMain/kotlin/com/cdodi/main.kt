@@ -51,6 +51,7 @@ private fun App() {
                                 localMatrix = null
                             )
                         }
+                        
                         onDrawBehind {
                             drawIntoCanvas { canvas ->
                                 canvas.nativeCanvas.drawPaint(shaderPaint)
