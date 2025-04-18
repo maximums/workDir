@@ -1,13 +1,10 @@
 package com.cdodi
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.*
@@ -20,11 +17,9 @@ import androidx.compose.ui.util.fastRoundToInt
 import androidx.compose.ui.window.ComposeViewport
 import com.cdodi.components.*
 import kotlinx.browser.document
-import kotlinx.browser.window
 import org.jetbrains.skia.*
 import org.jetbrains.skia.Paint
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() {
     ComposeViewport(document.body!!) {
         App()
@@ -63,73 +58,43 @@ private fun App() {
                         }
                     }
             ) {
-                val homeButton = remember {
-                    movableContentWithReceiverOf<LookaheadScope> {
-                        UiCard(
-                            modifier = Modifier
-                                .size(200.dp, 250.dp)
-                                .padding(10.dp)
-                                .then(AnimatePlacementNodeElement(lookaheadScope = this))
-                        ) {
-                            Text(text = "Home", fontSize = 30.sp, color = Color(0xa0_5a_d6_ff))
-                        }
-                    }
-                }
+                val homeButton = movableButton(
+                    text = "Home",
+                    orientation = Orientation.TopStart,
+                    onClick = { isInCenter = !isInCenter }
+                )
 
-                val aboutButton = remember {
-                    movableContentWithReceiverOf<LookaheadScope, Shape, Modifier> { shape, modifier ->
-                        UiCard(
-                            shape = shape,
-                            modifier = modifier
-                                .padding(10.dp)
-                                .then(AnimatePlacementNodeElement(lookaheadScope = this))
-                        ) {
-                            Text(text = "About", fontSize = 30.sp, color = Color(0xa0_5a_d6_ff))
-                        }
-                    }
-                }
+                val aboutButton = movableButton(
+                    text = "About",
+                    orientation = Orientation.TopEnd,
+                    onClick = { isInCenter = !isInCenter }
+                )
 
-                val contactsButton = remember {
-                    movableContentWithReceiverOf<LookaheadScope, Shape> { shape ->
-                        UiCard(
-                            shape = shape,
-                            modifier = Modifier
-                                .size(200.dp, 250.dp)
-                                .padding(10.dp)
-                                .then(AnimatePlacementNodeElement(lookaheadScope = this))
-                        ) {
-                            Text(text = "Contacts", fontSize = 30.sp, color = Color(0xa0_5a_d6_ff))
-                        }
-                    }
-                }
+                val contactsButton = movableButton(
+                    text = "Contacts",
+                    orientation = Orientation.BottomStart,
+                    onClick = { isInCenter = !isInCenter }
+                )
 
-                val sketchButton = remember {
-                    movableContentWithReceiverOf<LookaheadScope> {
-                        UiCard(
-                            modifier = Modifier
-                                .size(200.dp, 250.dp)
-                                .padding(10.dp)
-                                .then(AnimatePlacementNodeElement(lookaheadScope = this))
-                        ) {
-                            Text(text = "Sketch", fontSize = 30.sp, color = Color(0xa0_5a_d6_ff))
-                        }
-                    }
-                }
-                Button(modifier = Modifier.align(Alignment.BottomCenter), onClick = { isInCenter = !isInCenter }) {Text("Click Me")}
+                val sketchButton = movableButton(
+                    text = "Sketch",
+                    orientation = Orientation.BootomEnd,
+                    onClick = { isInCenter = !isInCenter }
+                )
 
                 if (isInCenter) {
                     CenterMenuForm {
-                        homeButton()
-                        aboutButton(rightButtonShape, Modifier.size(200.dp, 250.dp))
-                        contactsButton(rightButtonShape)
-                        sketchButton()
+                        homeButton(Modifier.size(200.dp, 250.dp))
+                        aboutButton(Modifier.size(200.dp, 250.dp))
+                        contactsButton(Modifier.size(200.dp, 250.dp))
+                        sketchButton(Modifier.size(200.dp, 250.dp))
                     }
                 } else {
                     TopBarForm {
-                        homeButton()
-                        aboutButton(RectangleShape, Modifier.size(300.dp, 100.dp))
-                        contactsButton(RectangleShape)
-                        sketchButton()
+                        homeButton(Modifier.size(300.dp, 100.dp))
+                        aboutButton(Modifier.size(300.dp, 100.dp))
+                        contactsButton(Modifier.size(300.dp, 100.dp))
+                        sketchButton(Modifier.size(300.dp, 100.dp))
                     }
                 }
             }
@@ -137,31 +102,39 @@ private fun App() {
     }
 }
 
+@Composable
+fun movableButton(
+    text: String,
+    orientation: Orientation,
+    onClick: () -> Unit = {},
+): @Composable LookaheadScope.(Modifier) -> Unit {
+    return remember {
+        movableContentWithReceiverOf { modifier ->
+            UiCard(
+                orientation = orientation,
+                onClick = onClick,
+                modifier = modifier.then(AnimatePlacementNodeElement(lookaheadScope = this))
+            ) {
+                Text(text = text, fontSize = 30.sp, color = Color(0xa0_5a_d6_ff))
+            }
+        }
+    }
+}
 
-@OptIn(ExperimentalLayoutApi::class)
+
 @Composable
 private fun CenterMenuForm(content: @Composable () -> Unit) {
     FlowRow(
-//        horizontalArrangement = Arrangement.Center,
-//        verticalArrangement = Arrangement.Center,
-//        modifier = Modifier.fillMaxSize(),
-        maxItemsInEachRow = 2
+        maxItemsInEachRow = 2,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         content()
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun BoxScope.TopBarForm(content: @Composable () -> Unit) {
-//    FlowRow(
-////        horizontalArrangement = Arrangement.Center,
-////        verticalArrangement = Arrangement.Top,
-//        modifier = Modifier.align(Alignment.TopCenter),
-//        maxItemsInEachRow = 4
-//    ) {
-//        content()
-//    }
     Row(
         modifier = Modifier.align(Alignment.TopCenter),
         verticalAlignment = Alignment.Top,

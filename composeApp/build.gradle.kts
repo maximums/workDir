@@ -28,9 +28,17 @@ kotlin {
         }
         binaries.executable()
     }
-    
+
+    compilerOptions {
+        optIn = listOf(
+            "androidx.compose.ui.ExperimentalComposeUiApi",
+            "androidx.compose.animation.core.ExperimentalAnimatableApi",
+            "androidx.compose.foundation.layout.ExperimentalLayoutApi"
+        )
+    }
+
     sourceSets {
-        
+
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
